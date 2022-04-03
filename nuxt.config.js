@@ -38,7 +38,7 @@ export default {
     '@nuxtjs/pwa',
     '@nuxtjs/auth-next',
   ],
-  target: 'static',
+  target: 'server',
 
 
   tailwindcss: {
