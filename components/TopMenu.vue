@@ -1,28 +1,22 @@
 <template>
-  <div class="container mx-auto my-4 flex text-sm font-medium text-white">
-    <Back />
-    <div v-if="$auth.loggedIn" class="ml-auto">
-      <NuxtLink
-        class="block rounded py-2 px-2 hover:bg-gray-600 hover:text-white"
-        to="/settings"
-        ><SettingsIcon />
-      </NuxtLink>
-    </div>
-    <div v-else class="ml-auto">
-      <NuxtLink to="/login">Sign in</NuxtLink>
+  <div class="container mx-auto my-4">
+    <div
+      class="ml-2 mr-4 flex items-center text-sm font-medium text-white"
+    >
+      <Back />
+      <User class="ml-auto"/>
     </div>
   </div>
 </template>
 
 <script>
+import User from '~/components/User.vue'
 import Back from '~/components/Back.vue'
-import { SettingsIcon } from 'vue-feather-icons'
 
 export default {
   components: {
+    User,
     Back,
-    SettingsIcon,
   },
-  methods: {},
 }
 </script>

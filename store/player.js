@@ -1,14 +1,8 @@
 import { Howl, Howler } from 'howler'
 import _ from 'lodash'
+import { formatTime } from '~/services/helper.js'
 
-let sound
-
-let formatTime = (secs) => {
-  var minutes = Math.floor(secs / 60) || 0;
-  var seconds = Math.floor((secs - minutes * 60)) || 0;
-
-  return minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
-}
+let sound = null
 
 export const state = () => ({
   playlist: [],
@@ -21,7 +15,12 @@ export const state = () => ({
 
 export const getters = {
   nextTrack(state) {
-    const nextTrackIndex = _.findIndex(state.playlist.tracks, (track) => track.id === state.track.id, -1) + 1
+    const nextTrackIndex =
+      _.findIndex(
+        state.playlist.tracks,
+        (track) => track.id === state.track.id,
+        -1
+      ) + 1
     return _.get(state, `playlist.tracks.${nextTrackIndex}`)
   },
 }
@@ -48,19 +47,18 @@ export const mutations = {
 }
 
 export const actions = {
-  setSeek({commit, dispatch}) {
+  setSeek({ commit, dispatch }) {
     let seek = sound.seek() || 0
-    let progress = ((seek / sound.duration() * 100)) || 0
+    let progress = (seek / sound.duration()) * 100 || 0
     commit('setProggress', progress)
     commit('setSeek', seek)
-    if (sound.playing())
-    {
+    if (sound.playing()) {
       setTimeout(() => {
         dispatch('setSeek')
       }, 1000)
     }
   },
-  playToggle({commit}) {
+  playToggle({ commit }) {
     if (!sound) {
       return false
     }
@@ -72,12 +70,15 @@ export const actions = {
       commit('setPlaying', true)
     }
   },
-  play({commit, dispatch, getters}, {playlist, track}) {
+  play({ commit, dispatch, getters }, { playlist, track }) {
     if (sound && sound.playing()) {
       sound.stop()
     }
     if (playlist) {
-      commit('setPlaylist', {...playlist, tracks: playlist.tracks.filter(t => !t.src)})
+      commit('setPlaylist', {
+        ...playlist,
+        tracks: playlist.tracks.filter((t) => !t.src),
+      })
     }
     if (track) {
       commit('setTrack', track)
@@ -86,7 +87,7 @@ export const actions = {
         html5: true,
         onend() {
           commit('setTrack', getters.nextTrack)
-          dispatch('play', {track: getters.nextTrack})
+          dispatch('play', { track: getters.nextTrack })
         },
         onplay() {
           commit('setPlaying', true)

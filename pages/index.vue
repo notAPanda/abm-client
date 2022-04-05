@@ -9,11 +9,9 @@
         :to="`/playlist/${playlist.id}`"
         class="relative block overflow-hidden"
       >
-        <img
-          alt="ecommerce"
+        <ImageComponent
           class="blockw-full rounded object-cover object-center"
           :src="playlist.cover_photo"
-          lazyload
         />
         <div class="mt-3">
           <h3 class="title-font text-xs tracking-widest text-gray-300">
@@ -36,8 +34,13 @@
 </template>
 
 <script>
+import ImageComponent from '~/components/ImageComponent.vue'
+
 export default {
   name: 'IndexPage',
+  components: {
+    ImageComponent,
+  },
   data: () => ({
     albums: [],
   }),

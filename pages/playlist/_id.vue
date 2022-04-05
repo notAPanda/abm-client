@@ -1,54 +1,77 @@
 <template>
   <div v-if="playlist" class="container mx-auto">
-    <div
-      class="shaow mx-4 mb-4 flex flex-col overflow-hidden rounded bg-gray-700 text-gray-100 sm:mx-0 md:flex-row"
-    >
-      <img
+    <div class="mx-4 mb-4 flex flex-col sm:mx-0 md:flex-row">
+      <ImageComponent
+        class="max-h-60 rounded object-cover md:max-h-60"
         :src="playlist.cover_photo"
-        alt=""
-        class="max-h-60 object-cover md:max-h-60"
       />
-      <div class="m-4 grid content-between">
-        <div>
-          <div class="text-xl">
-            {{ playlist.title }}
-          </div>
-          <div>
-            {{ playlist.description }}
-          </div>
+      <div class="md:ml-4">
+        <div
+          class="md-mt-0 mb-4 mt-4 text-4xl font-extrabold text-white md:mt-0"
+        >
+          {{ playlist.title }}
         </div>
-        <div class="mt-4">
-          <button class="rounded-full bg-indigo-600 p-3" @click="play()">
-            <PlayIcon size="25"></PlayIcon>
-          </button>
+        <div class="text-sm text-gray-300">
+          {{ playlist.description }}
         </div>
       </div>
     </div>
-    <div class="overflow-hidden border-b border-gray-800 bg-gray-600 shadow">
-      <table class="min-w-full divide-y divide-gray-200">
-        <tbody class="divide-y divide-gray-800">
+    <div class="mx-4 my-6 md:mx-0">
+      <div class="">
+        <button
+          class="rounded-full bg-indigo-600 p-3 text-white transition-all hover:scale-105"
+          @click="play()"
+        >
+          <PlayIcon class="pl-1" size="25"></PlayIcon>
+        </button>
+      </div>
+    </div>
+    <div class="mx-4 md:mx-0">
+      <table class="min-w-full">
+        <thead>
+          <tr class="text-gray-400">
+            <th class="w-8 text-center text-sm font-light uppercase">#</th>
+            <th class="text-left text-sm font-light uppercase">Title</th>
+            <th class="text-sm font-light uppercase"></th>
+            <th class="text-sm font-light uppercase">
+              <ClockIcon size="15" class="ml-auto" />
+            </th>
+            <th class="text-sm font-light uppercase"></th>
+          </tr>
+        </thead>
+        <tbody class="">
           <tr
             @click="play(track)"
-            v-for="track in playlist.tracks"
+            v-for="(track, index) in playlist.tracks"
             :key="track.id"
+            class="transition-all"
             :class="{
               'cursor-pointer': track.src,
-              'hover:bg-gray-500': track.src,
-              'bg-gray-700': !track.src,
+              'hover:bg-gray-800': track.src,
             }"
           >
-            <td class="whitespace-nowrap px-6 py-4">
+            <td class="w-8 text-center text-gray-400">
+              <span
+                v-if="currentTrack && currentTrack.id === track.id && playing"
+                class="text-indigo-500"
+                ><PauseCircleIcon
+              /></span>
+              <span
+                v-else-if="currentTrack && currentTrack.id === track.id"
+                class="text-indigo-500"
+                ><PlayCircleIcon
+              /></span>
+              <span v-else>{{ index + 1 }}</span>
+            </td>
+            <td class="whitespace-nowrap py-2">
               <div class="flex items-center">
-                <div class="ml-4">
-                  <div
-                    class="text-sm font-medium"
-                    :class="[track.src ? 'text-white' : 'text-gray-400']"
-                  >
+                <div class="">
+                  <div :class="[track.src ? 'text-white' : 'text-gray-400']">
                     {{ track.title }}
                   </div>
                   <div
-                    class="text-xs"
-                    :class="[track.src ? 'text-gray-300' : 'text-gray-500']"
+                    class="text-sm font-light"
+                    :class="[track.src ? 'text-gray-400' : 'text-gray-500']"
                   >
                     {{ playlist.author.name }}
                   </div>
@@ -56,9 +79,19 @@
               </div>
             </td>
             <td class="">
-              <a v-if="$auth.loggedIn" href="#" class="ml-auto text-indigo-400 hover:text-indigo-600">
-                <HeartIcon
-              /></a>
+              <a
+                v-if="$auth.loggedIn"
+                href="#"
+                class="ml-auto text-indigo-400 hover:text-indigo-600"
+              >
+                <HeartIcon class="ml-auto" />
+              </a>
+            </td>
+            <td class="text-right text-gray-400">
+              {{ formatTime(track.duration) }}
+            </td>
+            <td class="text-gray-900 hover:text-gray-400">
+              <MoreHorizontalIcon class="ml-auto" />
             </td>
           </tr>
         </tbody>
@@ -68,19 +101,44 @@
 </template>
 
 <script>
-import { HeartIcon, PlayIcon } from 'vue-feather-icons'
+import {
+  HeartIcon,
+  PlayIcon,
+  MoreHorizontalIcon,
+  ClockIcon,
+  PauseCircleIcon,
+  PauseIcon,
+  PlayCircleIcon,
+} from 'vue-feather-icons'
+import { formatTime } from '~/services/helper.js'
+import ImageComponent from '~/components/ImageComponent.vue'
 
 export default {
   name: 'IndexPage',
   components: {
+    ClockIcon,
     HeartIcon,
     PlayIcon,
+    MoreHorizontalIcon,
+    PauseCircleIcon,
+    PauseIcon,
+    PlayCircleIcon,
+    ImageComponent,
   },
   data: () => ({
     playlist: null,
   }),
   methods: {
+    formatTime(duration) {
+      return formatTime(duration)
+    },
     play(track) {
+      // if (
+      //   (!track && this.playing)  || (this.currentTrack && this.currentTrack.id === track.id)
+      // ) {
+      //   return this.$store.dispatch('player/playToggle')
+      // }
+
       let playTrack = track || this.playlist.tracks.filter((t) => t.src)[0]
 
       if (!playTrack.src) {
@@ -91,6 +149,14 @@ export default {
         playlist: this.playlist,
         track: playTrack,
       })
+    },
+  },
+  computed: {
+    playing() {
+      return this.$store.state.player.playing
+    },
+    currentTrack() {
+      return this.$store.state.player.track
     },
   },
   async fetch() {
