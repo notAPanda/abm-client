@@ -1,17 +1,17 @@
 import _ from 'lodash'
 
 export const state = () => ({
-  playlists: [],
+  albums: [],
 })
 
 export const mutations = {
   add(state, payload) {
-    state.playlists = _.uniqBy([...payload, ...state.playlists], 'id')
+    state.albums = _.uniqBy([...payload, ...state.albums], 'id')
   },
 }
 
 export const getters = {
   playlist: (state) => (id) => {
-    return state.playlists.find((playlist) => playlist.id == id)
+    return state.albums.find((playlist) => playlist.id == id)
   },
 }

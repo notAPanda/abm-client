@@ -66,8 +66,14 @@
             <td class="whitespace-nowrap py-2">
               <div class="flex items-center">
                 <div class="">
-                  <div class="max-w-[280px] truncate" :class="[track.src ? 'text-white' : 'text-gray-400']">
+                  <div :class="[track.src ? 'text-white' : 'text-gray-400']" class="max-w-[280px] truncate">
                     {{ track.title }}
+                  </div>
+                  <div
+                    class="text-sm font-light max-w-[280px] truncate"
+                    :class="[track.src ? 'text-gray-400' : 'text-gray-500']"
+                  >
+                    {{ playlist.author.name }}
                   </div>
                 </div>
               </div>
@@ -151,14 +157,13 @@ export default {
     },
   },
   async fetch() {
-    let { data } = await this.$axios.get(`/api/playlists/${this.$route.params.id}`)
-    this.playlist = data.playlist
+    let { data } = await this.$axios.get(`/api/albums/${this.$route.params.id}`)
+    this.playlist = data.album
 
     if (this.$auth.loggedIn && this.$store.getters['liked/noLiked']) {
       let liked = await this.$axios.get('/api/liked')
       this.$store.commit('liked/set', _.get(liked, 'data.liked.tracks', []))
     }
-
   },
 }
 </script>
