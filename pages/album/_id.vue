@@ -138,8 +138,8 @@ export default {
 
       let playTrack = track || this.playlist.tracks.filter((t) => t.src)[0]
 
-      if (!playTrack.src) {
-        return
+      if (!playTrack || !playTrack.src) {
+        return null
       }
 
       this.$store.dispatch('player/play', {

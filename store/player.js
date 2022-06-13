@@ -5,7 +5,7 @@ import { formatTime } from '~/services/helper.js'
 let sound = null
 
 export const state = () => ({
-  playlist: [],
+  playlist: {},
   track: null,
   playing: false,
   duration: '00:00',
@@ -77,7 +77,7 @@ export const actions = {
     if (playlist) {
       commit('setPlaylist', {
         ...playlist,
-        tracks: playlist.tracks.filter((t) => !t.src),
+        tracks: playlist.tracks.filter((t) => t.src),
       })
     }
     if (track) {
