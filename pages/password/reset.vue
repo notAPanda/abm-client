@@ -6,49 +6,34 @@
       <div>
         <img class="mx-auto h-12 w-auto" src="/icon.png" alt="Workflow" />
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-100">
-          Sign up
+          Reset password
         </h2>
       </div>
       <form class="mt-8 space-y-6">
         <input type="hidden" name="remember" value="true" />
         <div class="-space-y-px rounded-md shadow-sm">
           <div>
-            <label for="name" class="sr-only">Name</label>
-            <input
-              v-model="name"
-              id="name"
-              name="name"
-              type="text"
-              autocomplete="name"
-              required="true"
-              class="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              placeholder="Name"
-            />
-          </div>
-          <div>
-            <label for="email-address" class="sr-only">Email address</label>
-            <input
-              v-model="email"
-              id="email-address"
-              name="email"
-              type="email"
-              autocomplete="email"
-              required="true"
-              class="relative block w-full appearance-none rounded-none border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              placeholder="Email address"
-            />
-          </div>
-          <div>
-            <label for="password" class="sr-only">Password</label>
+            <label for="email-address" class="sr-only">New password</label>
             <input
               v-model="password"
               id="password"
               name="password"
               type="password"
-              autocomplete="current-password"
-              required=""
-              class="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              placeholder="Password"
+              required="true"
+              class="relative block w-full appearance-none rounded border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+              placeholder="New password"
+            />
+          </div>
+          <div>
+            <label for="email-address" class="sr-only">New password</label>
+            <input
+              v-model="password_confirmation"
+              id="password-confirmation"
+              name="password_confirmation"
+              type="password"
+              required="true"
+              class="relative block w-full appearance-none rounded border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+              placeholder="Password confirmation"
             />
           </div>
           <div v-if="errors">
@@ -70,7 +55,7 @@
           >
             <span class="absolute inset-y-0 left-0 flex items-center pl-3">
             </span>
-            Sign up
+            Reset password
           </button>
         </div>
       </form>
@@ -80,16 +65,20 @@
 
 <script>
 export default {
-  name: 'RegisterPage',
+  name: 'PasswordResetPage',
   mounted() {
     if (this.$auth.loggedIn) {
       this.$router.push('/')
     }
+
+    this.email = _.get(this.$route, 'query.email')
+    this.token = _.get(this.$route, 'query.token')
   },
   data: () => ({
-    name: '',
-    email: '',
     password: '',
+    password_confirmation: '',
+    token: '',
+    email: '',
     errors: null,
   }),
   methods: {
@@ -98,10 +87,11 @@ export default {
       this.$axios
         .get('/sanctum/csrf-cookie')
         .then(() => {
-          return this.$axios.$post('/register', {
-            name: this.name,
+          return this.$axios.$post('/reset-password', {
             email: this.email,
             password: this.password,
+            password_confirmation: this.password_confirmation,
+            token: this.token,
           })
         })
         .then((data) => {
@@ -112,19 +102,17 @@ export default {
             },
           })
         })
+        .then(() => {
+          this.$router.push({
+            path: '/',
+          })
+        })
         .catch((error) => {
           let status = _.get(error, 'response.status')
           let errors = _.get(error, 'response.data.errors')
 
-          if (_.includes([419], status)) {
-          }
           if (_.includes([422], status)) {
             this.errors = errors
-          }
-          if (_.includes([401], status)) {
-            this.errors = {
-              email: ['Credentials does not match.'],
-            }
           }
         })
     },

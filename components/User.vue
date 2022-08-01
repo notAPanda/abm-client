@@ -9,6 +9,7 @@
     </div>
     <div v-else class="ml-auto">
       <NuxtLink to="/login">Sign in</NuxtLink>
+      <NuxtLink to="/register" class="bg-white text-gray-700 px-3 py-1 rounded ml-3">Sign up</NuxtLink>
     </div>
   </div>
 </template>

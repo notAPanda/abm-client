@@ -47,6 +47,11 @@
               placeholder="Password"
             />
           </div>
+          <div v-if="errors">
+            <div v-for="(error, index) in errors" :key="index">
+              <span v-for="m in error" :key="m" class="text-red-500 text-sm mt-1">{{m}}</span>
+            </div>
+          </div>
         </div>
 
         <div class="flex items-center justify-between">
@@ -63,12 +68,11 @@
           </div>
 
           <div class="text-sm">
-            <a
-              href="#"
-              class="font-medium text-indigo-400 hover:text-indigo-500"
-            >
-              Forgot your password?
-            </a>
+                      <NuxtLink
+            to="/password/forgot"
+            class="font-medium text-indigo-400 hover:text-indigo-500"
+            >Forgot your password?</NuxtLink>
+
           </div>
         </div>
 
@@ -93,6 +97,7 @@ export default {
   data: () => ({
     email: '',
     password: '',
+    errors: null,
   }),
   mounted() {
     if (this.$auth.loggedIn) {
@@ -101,12 +106,30 @@ export default {
   },
   methods: {
     login() {
-      this.$auth.loginWith('laravelSanctum', {
-        data: {
-          email: this.email,
-          password: this.password,
-        },
-      })
+      this.errors = null
+
+      this.$auth
+        .loginWith('laravelSanctum', {
+          data: {
+            email: this.email,
+            password: this.password,
+          },
+        })
+        .catch((error) => {
+          let status = _.get(error, 'response.status')
+          let errors = _.get(error, 'response.data.errors')
+
+          if (_.includes([419],status)) {
+          }
+          if (_.includes([422], status)) {
+            this.errors = errors
+          }
+          if (_.includes([401], status)) {
+            this.errors = {
+              email: ['Credentials does not match.'],
+            }
+          }
+        })
     },
   },
 }
